@@ -2,24 +2,26 @@ import { useState, useEffect } from "react";
 import "./TodoList.css";
 
 const TodoList = () => {
-  // Menyimpan data tugas dari localStorage
+  // Menyimpan dan mengambil data tugas
   const [todos, setTodos] = useState(() => {
     try {
       const savedTodos = localStorage.getItem("todos");
+
       if (!savedTodos) return [];
 
       const parsedTodos = JSON.parse(savedTodos);
+
       return Array.isArray(parsedTodos) ? parsedTodos : [];
     } catch (error) {
-      console.error("Gagal membaca todos:", error);
+      console.error("Gagal membaca data tugas:", error);
       return [];
     }
   });
 
-  // Menyimpan data input
+  // Menyimpan teks yang diketik pengguna
   const [input, setInput] = useState("");
 
-  // Menyimpan filter yang dipilih
+  // Menyimpan pilihan filter
   const [filter, setFilter] = useState("all");
 
   // Menghitung jumlah tugas
@@ -27,11 +29,12 @@ const TodoList = () => {
   const activeTasks = todos.filter((todo) => !todo.completed).length;
   const completedTasks = todos.filter((todo) => todo.completed).length;
 
-  // Menambahkan tugas
+  // Menambahkan tugas baru
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const title = input.trim();
+
     if (!title) return;
 
     const newTodo = {
@@ -49,7 +52,7 @@ const TodoList = () => {
     setTodos((currentTodos) => currentTodos.filter((todo) => todo.id !== id));
   };
 
-  // Mengubah status tugas
+  // Mengubah status penyelesaian tugas
   const handleToggle = (id) => {
     setTodos((currentTodos) =>
       currentTodos.map((todo) =>
@@ -58,19 +61,20 @@ const TodoList = () => {
     );
   };
 
-  // Memfilter tugas
+  // Memfilter tugas sesuai pilihan pengguna
   const filteredTodos = todos.filter((todo) => {
     if (filter === "active") return !todo.completed;
     if (filter === "completed") return todo.completed;
+
     return true;
   });
 
-  // Menyimpan perubahan todos ke localStorage
+  // Menyimpan perubahan data ke localStorage
   useEffect(() => {
     try {
       localStorage.setItem("todos", JSON.stringify(todos));
     } catch (error) {
-      console.error("Gagal menyimpan todos:", error);
+      console.error("Gagal menyimpan data tugas:", error);
     }
   }, [todos]);
 
@@ -79,40 +83,42 @@ const TodoList = () => {
       <section className="todo-app">
         {/* Header */}
         <header className="todo-header">
-          <p className="todo-eyebrow">DAILY PLANNER</p>
-          <h1 className="todo-heading">My Todo List</h1>
+          <p className="todo-eyebrow">PERENCANAAN HARIAN</p>
+
+          <h1 className="todo-heading">Daftar Tugasku</h1>
+
           <p className="todo-subtitle">
-            Organize your day, one task at a time.
+            Kelola tugas harianmu dengan lebih mudah.
           </p>
         </header>
 
-        {/* Task Statistics */}
+        {/* Ringkasan Tugas */}
         <section className="todo-stats">
           <article className="todo-stat-card stat-total">
-            <span className="todo-stat-label">Total Tasks</span>
+            <span className="todo-stat-label">Total Tugas</span>
             <strong className="todo-stat-value">{totalTasks}</strong>
           </article>
 
           <article className="todo-stat-card stat-active">
-            <span className="todo-stat-label">Active</span>
+            <span className="todo-stat-label">Belum Selesai</span>
             <strong className="todo-stat-value">{activeTasks}</strong>
           </article>
 
           <article className="todo-stat-card stat-completed">
-            <span className="todo-stat-label">Completed</span>
+            <span className="todo-stat-label">Sudah Selesai</span>
             <strong className="todo-stat-value">{completedTasks}</strong>
           </article>
         </section>
 
-        {/* Add Task Form */}
+        {/* Form Tambah Tugas */}
         <form className="todo-form" onSubmit={handleSubmit}>
           <input
             className="todo-input"
             type="text"
             value={input}
-            placeholder="Tulis tugas baru..."
+            placeholder="Tulis tugas yang ingin kamu selesaikan..."
             onChange={(e) => setInput(e.target.value)}
-            aria-label="Nama tugas baru"
+            aria-label="Tulis tugas baru"
           />
 
           <button
@@ -125,25 +131,30 @@ const TodoList = () => {
           </button>
         </form>
 
-        {/* Filter Buttons */}
+        {/* Daftar Tugas */}
         <section className="todo-list-section">
           <div className="todo-section-heading">
             <div>
-              <h2>My Tasks</h2>
-              <p>Manage your daily activities.</p>
+              <h2>Daftar Tugas</h2>
+              <p>Pantau dan kelola semua tugasmu di sini.</p>
             </div>
 
-            <span className="todo-count">{filteredTodos.length} tasks</span>
+            <span className="todo-count">{filteredTodos.length} tugas</span>
           </div>
 
-          <div className="todo-filters" role="group" aria-label="Filter tugas">
+          {/* Filter Tugas */}
+          <div
+            className="todo-filters"
+            role="group"
+            aria-label="Filter daftar tugas"
+          >
             <button
               type="button"
               className={`todo-filter ${filter === "all" ? "is-active" : ""}`}
               aria-pressed={filter === "all"}
               onClick={() => setFilter("all")}
             >
-              All
+              Semua
             </button>
 
             <button
@@ -152,7 +163,7 @@ const TodoList = () => {
               aria-pressed={filter === "active"}
               onClick={() => setFilter("active")}
             >
-              Active
+              Belum Selesai
             </button>
 
             <button
@@ -161,11 +172,11 @@ const TodoList = () => {
               aria-pressed={filter === "completed"}
               onClick={() => setFilter("completed")}
             >
-              Completed
+              Sudah Selesai
             </button>
           </div>
 
-          {/* Todo List / Empty State */}
+          {/* Empty State atau Daftar Tugas */}
           {filteredTodos.length === 0 ? (
             <div className="todo-empty">
               <div className="todo-empty-icon" aria-hidden="true">
@@ -175,12 +186,12 @@ const TodoList = () => {
               <h3>
                 {todos.length === 0
                   ? "Belum ada tugas"
-                  : "Tidak ada tugas di sini"}
+                  : "Tidak ada tugas yang cocok"}
               </h3>
 
               <p>
                 {todos.length === 0
-                  ? "Tambahkan tugas pertamamu untuk memulai."
+                  ? "Tambahkan tugas pertamamu untuk mulai mengatur aktivitas."
                   : "Coba pilih filter yang berbeda."}
               </p>
             </div>
@@ -197,11 +208,17 @@ const TodoList = () => {
                       type="checkbox"
                       checked={todo.completed}
                       onChange={() => handleToggle(todo.id)}
-                      aria-label={`Tandai ${todo.title} sebagai selesai`}
+                      aria-label={
+                        todo.completed
+                          ? `Tandai ${todo.title} sebagai belum selesai`
+                          : `Tandai ${todo.title} sebagai selesai`
+                      }
                     />
 
                     <span
-                      className={`todo-item-title ${todo.completed ? "is-completed" : ""}`}
+                      className={`todo-item-title ${
+                        todo.completed ? "is-completed" : ""
+                      }`}
                     >
                       {todo.title}
                     </span>
@@ -211,7 +228,7 @@ const TodoList = () => {
                     className="todo-delete-button"
                     type="button"
                     onClick={() => handleDelete(todo.id)}
-                    aria-label={`Hapus ${todo.title}`}
+                    aria-label={`Hapus tugas ${todo.title}`}
                   >
                     Hapus
                   </button>
@@ -223,8 +240,8 @@ const TodoList = () => {
 
         {/* Footer */}
         <footer className="todo-footer">
-          <span>Small steps, big progress.</span>
-          <span>{activeTasks} remaining</span>
+          <span>Langkah kecil, kemajuan besar.</span>
+          <span>{activeTasks} tugas tersisa</span>
         </footer>
       </section>
     </main>
